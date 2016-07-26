@@ -9,6 +9,11 @@ import (
 	"os"
 )
 
+type info struct {
+	c color.RGBA
+	i image.RGBA
+}
+
 func averageColor(image image.RGBA) (average color.RGBA) {
 	var r, g, b, a int64
 	for x := 0; x < image.Bounds().Dx(); x++ {
