@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/draw"
 	"image/jpeg"
 	"os"
 )
@@ -35,8 +36,19 @@ func saveImage(path string, img image.Image) error {
 	return nil
 }
 
+func convertImage(img image.Image) *image.RGBA {
+	newimg := image.NewRGBA(img.Bounds())
+	
+	draw.Draw(newimg, newimg.Bounds(), img, image.ZP, draw.Src)
+
+	return newimg
+}
+
 func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
+
 	saveImage("saveHm.jpg", img)
+	convertImage(img)
+
 }
