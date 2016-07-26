@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"math"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
@@ -22,6 +23,7 @@ type info struct {
 
 func averageColor(image image.RGBA) (average color.RGBA) {
 	var r, g, b, a int64
+
 	for x := 0; x < image.Bounds().Dx(); x++ {
 		for y := 0; y < image.Bounds().Dy(); y++ {
 			color := image.RGBAAt(x, y)
@@ -31,6 +33,8 @@ func averageColor(image image.RGBA) (average color.RGBA) {
 			a += int64(color.A)
 		}
 	}
+	fmt.Println(r, g, b, a)
+
 	pixels := int64(image.Bounds().Dx() * image.Bounds().Dy())
 	average.R = uint8(r / pixels)
 	average.G = uint8(g / pixels)
@@ -103,17 +107,62 @@ func loadTiles() error {
 	return nil
 }
 
+func min( a, b int) int {
+	return int(math.Min(float64(a), float64(b)))
+}
+
+func square( x uint8 ) float64 {
+	return math.Pow(float64(x), 2)
+}
+
+func calculateDistance( col1 color.RGBA, col2 color.RGBA) float64 {
+	return math.Sqrt( square(col1.R-col2.R) + square(col1.G-col2.G) + square(col1.B-col2.B) + square(col1.A-col2.A) )
+}
+
+func createMosaic(org *image.RGBA) *image.RGBA{
+
+	img := image.NewRGBA(org.Bounds())
+
+	max_x := org.Bounds().Max.X - 1
+	max_y := org.Bounds().Max.Y - 1
+
+	for x := 0; x <= max_x; x += size {
+		for y := 0; y <= max_y; y += size {
+			rect := image.Rect(x, y, min(x+size, max_x), min(y+size, max_y))
+			tile := (org.SubImage(rect)).(*image.RGBA)
+			fmt.Println(rect)
+			avg := averageColor(*tile)
+
+			minimal := 1e9
+			distance := 0.0
+			closest := ""
+
+			for name, info := range tiles {
+				distance = calculateDistance(avg, info.c)
+				if distance < minimal {
+					minimal = distance
+					closest = name
+				}
+			}
+			
+			draw.Draw(img, rect, tiles[closest].i, image.ZP, draw.Src)
+			//return
+			//draw.DrawMask(org, rect, tiles[closest].i, rect.Bounds.Min, nil,  image.ZP, draw.Src)
+		}
+	}
+	return img
+}
+
 func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
 	rgba := convertImage(img)
-	saveImage("saveHm.jpg", rgba)
-
+	
 	err := loadTiles()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("%v\n", tiles)
+	saveImage("saveHm.jpg", createMosaic(rgba))
 }
