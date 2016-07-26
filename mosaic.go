@@ -37,7 +37,6 @@ func averageColor(image image.RGBA) (average color.RGBA) {
 		}
 		index += image.Stride - image.Bounds().Dx()*4
 	}
-	fmt.Println(r, g, b, a)
 
 	pixels := int64(image.Bounds().Dx() * image.Bounds().Dy())
 	average.R = uint8(r / pixels)
@@ -115,12 +114,16 @@ func min(a, b int) int {
 	return int(math.Min(float64(a), float64(b)))
 }
 
-func square(x uint8) float64 {
-	return math.Pow(float64(x), 2)
+func sqr(x float64) float64 {
+	return x * x
 }
 
-func calculateDistance(col1 color.RGBA, col2 color.RGBA) float64 {
-	return math.Sqrt(square(col1.R-col2.R) + square(col1.G-col2.G) + square(col1.B-col2.B) + square(col1.A-col2.A))
+func calculateDistance(a, b color.RGBA) float64 {
+	R := sqr(float64(a.R) - float64(b.R))
+	G := sqr(float64(a.G) - float64(b.G))
+	B := sqr(float64(a.B) - float64(b.B))
+	A := sqr(float64(a.A) - float64(b.A))
+	return math.Sqrt(R + G + B + A)
 }
 
 func createMosaic(org *image.RGBA) *image.RGBA {
@@ -134,7 +137,6 @@ func createMosaic(org *image.RGBA) *image.RGBA {
 		for y := 0; y <= max_y; y += size {
 			rect := image.Rect(x, y, min(x+size, max_x), min(y+size, max_y))
 			tile := (org.SubImage(rect)).(*image.RGBA)
-			fmt.Println(rect)
 			avg := averageColor(*tile)
 
 			minimal := 1e9
