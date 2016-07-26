@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
 	"os"
+	"path/filepath"
 )
 
 const size = 16 // size in pixels (square)
@@ -15,7 +17,7 @@ var tiles map[string]info
 
 type info struct {
 	c color.RGBA
-	i image.RGBA
+	i *image.RGBA
 }
 
 func averageColor(image image.RGBA) (average color.RGBA) {
@@ -73,11 +75,45 @@ func convertImage(img image.Image) *image.RGBA {
 	return newimg
 }
 
+func loadTile(path string, inf os.FileInfo, err error) error {
+	if !inf.Mode().IsRegular() {
+		return nil
+	}
+
+	tile, err := loadImage(path)
+	if err != nil {
+		return err
+	}
+
+	converted := convertImage(tile)
+	averageColor := averageColor(*converted)
+
+	tiles[path] = info{averageColor, converted}
+
+	return nil
+}
+
+func loadTiles() error {
+	tiles = make(map[string]info)
+
+	err := filepath.Walk("./tiles", loadTile)
+	if err != nil {
+		return errors.New("The directory can't be walked")
+	}
+	return nil
+}
+
 func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
 	rgba := convertImage(img)
 	saveImage("saveHm.jpg", rgba)
-	average := averageColor(*rgba)
-	fmt.Printf("%v\n", average)
+
+	err := loadTiles()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%v\n", tiles)
 }
