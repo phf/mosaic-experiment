@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/nfnt/resize"
 	"image"
 	"image/color"
 	"image/draw"
@@ -87,10 +88,12 @@ func loadTile(path string, inf os.FileInfo, err error) error {
 		return nil
 	}
 
-	tile, err := loadImage(path)
+	ntile, err := loadImage(path)
 	if err != nil {
 		return err
 	}
+
+	tile := resize.Resize(size, size, ntile, resize.Bicubic)
 
 	converted := convertImage(tile)
 	averageColor := averageColor(*converted)
