@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+const size = 16 // size in pixels (square)
+
+var tiles map[string]info
+
 type info struct {
 	c color.RGBA
 	i image.RGBA
