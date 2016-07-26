@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
-	_ "image/jpeg"
+	"image/jpeg"
 	"os"
 )
 
@@ -21,8 +21,22 @@ func loadImage(path string) (image.Image, error) {
 	return img, nil
 }
 
+func saveImage(path string, img image.Image) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	err = jpeg.Encode(file, img, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
-	fmt.Println(img)
+	saveImage("saveHm.jpg", img)
 }
