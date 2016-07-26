@@ -24,14 +24,18 @@ type info struct {
 func averageColor(image image.RGBA) (average color.RGBA) {
 	var r, g, b, a int64
 
-	for x := 0; x < image.Bounds().Dx(); x++ {
-		for y := 0; y < image.Bounds().Dy(); y++ {
-			color := image.RGBAAt(x, y)
-			r += int64(color.R)
-			g += int64(color.G)
-			b += int64(color.B)
-			a += int64(color.A)
+	start := image.PixOffset(image.Bounds().Min.X, image.Bounds().Min.Y)
+	index := start
+	for y := 0; y < image.Bounds().Dy(); y++ {
+		for x := 0; x < image.Bounds().Dx(); x++ {
+			pixel := image.Pix[index : index+4]
+			r += int64(pixel[0])
+			g += int64(pixel[1])
+			b += int64(pixel[2])
+			a += int64(pixel[3])
+			index += 4
 		}
+		index += image.Stride - image.Bounds().Dx()*4
 	}
 	fmt.Println(r, g, b, a)
 
