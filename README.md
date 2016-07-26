@@ -6,7 +6,7 @@ small image-mosaicing application.
 
 ## Contributors
 
-* Peter Froehlich
+* Peter Fröhlich
 * Fabian Parzefall
 * Luca Spataro
 * Luis Morales
