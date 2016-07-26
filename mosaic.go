@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"image"
-	"math"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
+	"math"
 	"os"
 	"path/filepath"
 )
@@ -107,19 +107,19 @@ func loadTiles() error {
 	return nil
 }
 
-func min( a, b int) int {
+func min(a, b int) int {
 	return int(math.Min(float64(a), float64(b)))
 }
 
-func square( x uint8 ) float64 {
+func square(x uint8) float64 {
 	return math.Pow(float64(x), 2)
 }
 
-func calculateDistance( col1 color.RGBA, col2 color.RGBA) float64 {
-	return math.Sqrt( square(col1.R-col2.R) + square(col1.G-col2.G) + square(col1.B-col2.B) + square(col1.A-col2.A) )
+func calculateDistance(col1 color.RGBA, col2 color.RGBA) float64 {
+	return math.Sqrt(square(col1.R-col2.R) + square(col1.G-col2.G) + square(col1.B-col2.B) + square(col1.A-col2.A))
 }
 
-func createMosaic(org *image.RGBA) *image.RGBA{
+func createMosaic(org *image.RGBA) *image.RGBA {
 
 	img := image.NewRGBA(org.Bounds())
 
@@ -144,7 +144,7 @@ func createMosaic(org *image.RGBA) *image.RGBA{
 					closest = name
 				}
 			}
-			
+
 			draw.Draw(img, rect, tiles[closest].i, image.ZP, draw.Src)
 			//return
 			//draw.DrawMask(org, rect, tiles[closest].i, rect.Bounds.Min, nil,  image.ZP, draw.Src)
@@ -157,7 +157,7 @@ func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
 	rgba := convertImage(img)
-	
+
 	err := loadTiles()
 	if err != nil {
 		fmt.Println(err)
