@@ -38,7 +38,7 @@ func saveImage(path string, img image.Image) error {
 
 func convertImage(img image.Image) *image.RGBA {
 	newimg := image.NewRGBA(img.Bounds())
-	
+
 	draw.Draw(newimg, newimg.Bounds(), img, image.ZP, draw.Src)
 
 	return newimg
@@ -47,8 +47,6 @@ func convertImage(img image.Image) *image.RGBA {
 func main() {
 	fmt.Println("Mosaic experiment is experimental!")
 	img, _ := loadImage("hm.jpg")
-
-	saveImage("saveHm.jpg", img)
-	convertImage(img)
-
+	rgba := convertImage(img)
+	saveImage("saveHm.jpg", rgba)
 }
